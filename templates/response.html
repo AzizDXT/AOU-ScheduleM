@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Response</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        pre {
+            white-space: pre-wrap; /* Enable wrapping of long lines */
+            word-wrap: break-word; /* Break long words */
+        }
+        .response-content {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px; /* Reduce padding */
+            }
+
+            h1 {
+                font-size: 1.5em; /* Title font size */
+            }
+
+            .btn {
+                width: 100%; /* Full width button */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-4">Response</h1>
+        <div class="response-content">
+            <pre id="responseText"></pre>
+        </div>
+        <button class="btn btn-primary mt-3" onclick="window.history.back()">Back</button>
+    </div>
+
+    <script>
+        // Get the response from the URL parameters
+        const params = new URLSearchParams(window.location.search);
+        const response = params.get('response');
+
+        // Display the response
+        document.getElementById('responseText').textContent = decodeURIComponent(response);
+    </script>
+</body>
+</html>
