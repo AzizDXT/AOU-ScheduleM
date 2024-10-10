@@ -1,7 +1,7 @@
 import csv
 
 # قراءة ملف CV.csv وحفظ البيانات المطلوبة في ملف جديد
-input_file = 'CS.csv'
+input_file = '2.CS.csv'
 output_file = 'filtered_CV.csv'
 
 # فتح الملف الأصلي للقراءة
@@ -16,6 +16,7 @@ with open(input_file, mode='r', encoding='windows-1252') as infile:
     tutor_schedule = {}
 
     for row in reader:
+        COURSEPROGRAM = row['COURSEPROGRAM']  # قراءة البرنامج التعليمي
         tutor_name = row['TUTOR']
         aou_email = row['AOU_EMAIL']
         full_schedule = row['FullSchedule']
@@ -25,16 +26,17 @@ with open(input_file, mode='r', encoding='windows-1252') as infile:
             if full_schedule not in tutor_schedule[tutor_name]['FullSchedule']:
                 tutor_schedule[tutor_name]['FullSchedule'].append(full_schedule)
         else:
-            # إضافة المدرب الجديد إلى القاموس
+            # إضافة المدرب الجديد إلى القاموس مع البرنامج التعليمي
             tutor_schedule[tutor_name] = {
                 'AOU_EMAIL': aou_email,
-                'FullSchedule': [full_schedule]  # اجعل التواقيت كقائمة
+                'FullSchedule': [full_schedule],  # اجعل التواقيت كقائمة
+                'COURSEPROGRAM': COURSEPROGRAM  # إضافة البرنامج التعليمي
             }
 
     # فتح الملف الجديد للكتابة
     with open(output_file, mode='w', newline='', encoding='utf-8') as outfile:
         # تحديد أسماء الأعمدة التي نريد الاحتفاظ بها
-        fieldnames = ['TUTOR', 'AOU_EMAIL', 'FullSchedule']
+        fieldnames = ['TUTOR', 'AOU_EMAIL', 'FullSchedule', 'COURSEPROGRAM']
         
         # كتابة البيانات المطلوبة في ملف جديد
         writer = csv.DictWriter(outfile, fieldnames=fieldnames)
@@ -45,11 +47,12 @@ with open(input_file, mode='r', encoding='windows-1252') as infile:
             writer.writerow({
                 'TUTOR': tutor,
                 'AOU_EMAIL': details['AOU_EMAIL'],
-                'FullSchedule': ', '.join(details['FullSchedule'])  # دمج التواقيت في خانة واحدة
+                'FullSchedule': ', '.join(details['FullSchedule']),  # دمج التواقيت في خانة واحدة
+                'COURSEPROGRAM': details['COURSEPROGRAM']  # إضافة البرنامج التعليمي
             })
             # طباعة القيم المطلوبة على الشاشة
             print("=" * 40)
             print(f"Tutor: {tutor}")
             print(f"AOU Email: {details['AOU_EMAIL']}")
             print(f"Full Schedule: {', '.join(details['FullSchedule'])}")
-
+            print(f"Course Program: {details['COURSEPROGRAM']}")

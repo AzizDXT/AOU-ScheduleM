@@ -4,9 +4,11 @@ import pandas as pd
 
 app = Flask(__name__)
 
-# Load the CSV file
+# Load the CSV file and sort tutors by name alphabetically
 def load_tutors_data():
     df = pd.read_csv('4.filtered_CV.csv')
+    # تأكد من استبدال 'Tutor Name' باسم العمود الصحيح
+    df.sort_values(by='TUTOR', inplace=True)  
     tutors = df.to_dict(orient='records')
     return tutors
 
@@ -21,4 +23,4 @@ def response():
     return render_template('response.html', gpt_response=gpt_response)
 
 if __name__ == '__main__':
-    app.run(debug=True,port=80)
+    app.run(debug=True, port=80)

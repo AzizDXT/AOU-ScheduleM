@@ -3,71 +3,191 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Schedule Meeting</title>
+    <title>AOUom Faculty Schedule</title>
+    
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         .container {
             margin-top: 30px;
         }
-        .tutor-card {
-            display: none; /* Hide initially */
-        }
         .logo {
-            max-width: 150px; /* Adjust the size of the logo as needed */
-            margin-bottom: 20px; /* Space below the logo */
+            max-width: 150px;
+            margin-bottom: 20px;
+        }
+        .tutor-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .tutor-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            text-align: left;
+        }
+        .tutor-email {
+            font-size: 0.9rem;
+            color: #555;
+            text-align: left;
+        }
+        .tutor-specialization {
+            text-align: right;
+            font-weight: normal;
+            font-size: 1rem;
+        }
+        .BusinessAdministration { background-color: rgba(0, 255, 170, 0.3); }
+        .EnglishLanguageandLiterature { background-color: rgba(255, 191, 0, 0.3); }
+        .Education { background-color: rgba(238, 255, 0, 0.3); }
+        .GeneralStudies { background-color: rgba(255, 0, 0, 0.3); }
+        .InformationTechnologyandComputing { background-color: rgba(0, 123, 255, 0.3); }
+        .Law { background-color: rgba(255, 0, 170, 0.3); }
+        .schedule-table {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        /* CSS للنقطة الخضراء */
+        .status {
+            position: fixed; /* لجعلها ثابتة في الزاوية */
+            top: 10px; /* المسافة من أعلى الصفحة */
+            left: 10px; /* المسافة من اليسار */
+            display: flex; /* لعرض النقطة وكلمة Online في نفس السطر */
+            align-items: center; /* لمحاذاة النقطة مع النص عمودياً */
+            font-size: 1rem; /* حجم النص */
+        }
+
+        .dot {
+            width: 10px; /* حجم النقطة */
+            height: 10px; /* حجم النقطة */
+            background-color: green; /* لون النقطة */
+            border-radius: 50%; /* لجعل النقطة دائرية */
+            margin-right: 5px; /* المسافة بين النقطة وكلمة Online */
+            animation: pulse 1s infinite; /* تأثير الوميض */
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.5); /* تكبير النقطة */
+            }
         }
     </style>
 </head>
 <body>
     <div class="container text-center">
-        <!-- Logo -->
-        <img src="AOU.png" alt="AOU Logo" class="logo"> <!-- تأكد من صحة المسار واسم الملف -->
+        <img src="https://raw.githubusercontent.com/AzizDXT/AOU-ScheduleM/refs/heads/main/templates/AOU.png" alt="AOU Logo" class="logo">
+        <h1 class="mt-4">AOUom Faculty Schedule</h1>
+        <p class="lead">AOUOM faculty busy slots based on Fall 2024 Master Timetable retrieved onTuesday, October 8, 2024 11:25 AMTuesday, October 8, 2024 11:25 AM</p>
 
-        <h1 class="mt-4">Schedule a Meeting</h1>
+        <label for="meetingDuration">Meeting Duration (hours):</label>
+        <input type="number" id="meetingDuration" class="form-control mb-3" value="1" min="0.5" step="0.5">
 
-        <!-- Search Input -->
+        <button onclick="sendData()" class="btn btn-primary mb-3">Find Available Slots</button>
+
+        <div id="results" class="mt-4" style="display:none;">
+            <h2>Available Time Slots</h2>
+            <div id="resultContent"></div>
+            <div id="scheduleTable" class="schedule-table mt-4"></div>
+            <div id="finalScheduleTable" class="schedule-table mt-4"></div> <!-- جدول النتائج النهائية -->
+        </div>
+
         <input type="text" id="search" class="form-control mb-3" placeholder="Search by name or email">
 
-        <!-- List of Tutors -->
+        <div class="form-check mb-3">
+            <input type="checkbox" id="hideTBA" class="form-check-input" onchange="filterTutors()">
+            <label class="form-check-label" for="hideTBA">Hide TBA</label>
+        </div>
+
+        <label for="courseProgram">Select Course Program:</label>
+        <select id="courseProgram" class="form-control mb-3" onchange="filterTutorsByProgram()">
+            <option value="all">All</option>
+            <option value="BusinessAdministration">Business Administration</option>
+            <option value="EnglishLanguageandLiterature">English Language and Literature</option>
+            <option value="Education">Education</option>
+            <option value="GeneralStudies">General Studies</option>
+            <option value="InformationTechnologyandComputing">Information Technology and Computing</option>
+            <option value="Law">Law</option>
+        </select>
+
+        <div class="form-check mb-3">
+            <input type="checkbox" id="selectAll" class="form-check-input" onchange="toggleSelectAll()">
+            <label class="form-check-label" for="selectAll">Select All Visible</label>
+        </div>
+
         <div id="tutorsList">
             {% for tutor in tutors %}
-            <div class="card mb-3 tutor-card">
+            <div class="card mb-3 tutor-card {{ tutor['COURSEPROGRAM'] | replace(' ', '') }}">
                 <div class="card-header">
                     <input type="checkbox" class="tutor-checkbox" data-name="{{ tutor['TUTOR'] }}" data-email="{{ tutor['AOU_EMAIL'] }}" data-schedule="{{ tutor['FullSchedule'] }}">
-                    {{ tutor['TUTOR'] }} - {{ tutor['AOU_EMAIL'] }}
-                </div>
-                <div class="card-body">
-                    <p>{{ tutor['FullSchedule'] }}</p>
+                    <div class="tutor-info">
+                        <div>
+                            <div class="tutor-name">{{ tutor['TUTOR'] }}</div>
+                            <div class="tutor-email">{{ tutor['AOU_EMAIL'] }}</div>
+                        </div>
+                        <div class="tutor-specialization">{{ tutor['SPECIALIZATION'] }}</div>
+                    </div>
                 </div>
             </div>
             {% endfor %}
         </div>
+    <div class="status">
+        <span class="dot"></span>Online
 
-        <!-- Meeting Duration Input -->
-        <label for="meetingDuration">Meeting Duration (hours):</label>
-        <input type="number" id="meetingDuration" class="form-control mb-3" value="1" min="0.5" step="0.5">
-        
-        <!-- Button to Find Available Slots -->
-        <button onclick="sendData()" class="btn btn-primary">Find Available Slots</button>
     </div>
 
     <script>
-        // Filter function for searching tutors
-        document.getElementById('search').addEventListener('input', function() {
-            const query = this.value.toLowerCase(); // Get search query and convert to lowercase
-            const tutorCards = document.querySelectorAll('.tutor-card'); // Get all tutor cards
+        function filterTutors() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const isChecked = document.getElementById('hideTBA').checked;
+            const tutorCards = document.querySelectorAll('.tutor-card');
+            const selectedProgram = document.getElementById('courseProgram').value;
             
             tutorCards.forEach(card => {
-                const tutorName = card.querySelector('.tutor-checkbox').dataset.name.toLowerCase(); // Get tutor name
-                const tutorEmail = card.querySelector('.tutor-checkbox').dataset.email.toLowerCase(); // Get tutor email
-                
-                if (tutorName.includes(query) || tutorEmail.includes(query)) {
-                    card.style.display = 'block'; // Show card if it matches search query
+                const scheduleText = card.querySelector('.tutor-checkbox').dataset.schedule;
+                const tutorName = card.querySelector('.tutor-checkbox').dataset.name.toLowerCase();
+                const tutorEmail = card.querySelector('.tutor-checkbox').dataset.email.toLowerCase();
+
+                const matchesSearch = tutorName.includes(query) || tutorEmail.includes(query);
+                const shouldHideTBA = isChecked && scheduleText.includes('TBA');
+                const matchesProgram = selectedProgram === 'all' || card.classList.contains(selectedProgram);
+
+                if (matchesSearch && !shouldHideTBA && matchesProgram) {
+                    card.style.display = 'block';
                 } else {
-                    card.style.display = 'none'; // Hide card if it doesn't match search query
+                    card.style.display = 'none';
                 }
             });
-        });
+
+            document.getElementById('selectAll').checked = false;
+        }
+
+        function filterTutorsByProgram() {
+            filterTutors();
+        }
+
+        function toggleSelectAll() {
+            const selectAllChecked = document.getElementById('selectAll').checked;
+            const visibleTutors = document.querySelectorAll('.tutor-card[style*="block"] .tutor-checkbox');
+
+            visibleTutors.forEach(checkbox => {
+                checkbox.checked = selectAllChecked;
+            });
+        }
+
+        document.getElementById('search').addEventListener('input', filterTutors);
 
         async function sendData() {
             const selectedTutors = [];
@@ -89,33 +209,77 @@
             const workingHours = "Sunday to Thursday, 8 AM to 10 PM";
             const schedules = selectedTutors.map(tutor => `${tutor.name}: ${tutor.schedule}`).join(', ');
 
-            // Get the current date and time in Muscat timezone
             const now = new Date();
             const muscatTime = now.toLocaleString("en-US", { timeZone: "Asia/Muscat" });
-            const currentDate = new Date(muscatTime).toISOString();  // ISO format for date and time
-
+            const currentDate = new Date(muscatTime).toISOString();
             const meetingDuration = document.getElementById('meetingDuration').value;
 
+            // First API request to get available slots
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer YOUR_API_KEY' // Replace with your actual API key
+                    'Authorization': `Bearer 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`, // استبدل بمفتاح API الخاص بك
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     model: "gpt-4o",
-                    messages: [{
-                        role: "user",
-                        content: `I need to schedule a meeting with the following tutors during the working hours from ${workingHours}. Their schedules are as follows: ${schedules}. The current date and time is ${currentDate}. The meeting duration is ${meetingDuration} hours. Please find the 5 closest available meeting times starting from now where all selected tutors are free.`
-                    }]
+                    messages: [
+                        { role: "system", content: "You are a helpful assistant." },
+                        { role: "user", content: `Please suggest available meeting times for the following tutors: ${schedules} on ${currentDate} for a duration of ${meetingDuration} hours. Their working hours are: ${workingHours}. + response as a html code! (important!!) please ALL RESPONSE HTML FROM FIRST LATTER TO END!! TO AVOIDE ERRORS! & remove 'html' word in the first and qute marks + with orgnized report with Table if avaliable + report first and table under report and make line like --------- to supret in the end` }
+                    ],
+                    max_tokens: 10000,
                 })
             });
 
-            const result = await response.json();
-            const responseText = result.choices[0].message.content;
+            const data = await response.json();
+            const availableSlots = data.choices[0].message.content;
+            document.getElementById('resultContent').innerHTML = availableSlots;
 
-            // Redirect to the results page with the response
-            window.location.href = `/response?response=${encodeURIComponent(responseText)}`;
+            document.getElementById('results').style.display = 'block';
+
+            // Second API request to create the schedule
+            await createSchedule(selectedTutors, availableSlots);
+        }
+
+        function createSchedule(selectedTutors, availableSlots) {
+            const tutorData = selectedTutors.map(tutor => `${tutor.name} (${tutor.email}): ${tutor.schedule}`).join('; ');
+
+            return fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer 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`, // استبدل بمفتاح API الخاص بك
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    model: "gpt-4o",
+                    messages: [
+                        { role: "system", content: "You are a helpful assistant." },
+                        { role: "user", content: `Create a meeting schedule for the following tutors: ${tutorData}. (only response meeting schedule TABLE HTML CODE!! directly!! to avoid errors (HTML code response)) + if need tell me any noite make noite cell ander table + The schedule is for five days a week and the timings are from 8:00 am to 10:00 pm From Sunday to Thursday. + remove html word in the first and qute marks + (The Table shows days and times for work time) ` }
+                    ],
+                    max_tokens: 10000,
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                const scheduleHTML = data.choices[0].message.content;
+                document.getElementById('finalScheduleTable').innerHTML = `<h2>Final Schedule</h2>${scheduleHTML}`;
+            })
+            .catch(error => console.error('Error creating schedule:', error));
+        }
+
+        function createScheduleTable(availableSlots) {
+            const slots = availableSlots.split('\n');
+            let scheduleHTML = '<table class="table"><thead><tr><th>Tutor</th><th>Available Slots</th></tr></thead><tbody>';
+
+            slots.forEach(slot => {
+                const [tutor, time] = slot.split(': ');
+                if (tutor && time) {
+                    scheduleHTML += `<tr><td>${tutor}</td><td>${time}</td></tr>`;
+                }
+            });
+
+            scheduleHTML += '</tbody></table>';
+            document.getElementById('scheduleTable').innerHTML = scheduleHTML;
         }
     </script>
 </body>
