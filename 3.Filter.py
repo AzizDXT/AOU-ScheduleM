@@ -2,7 +2,7 @@ import csv
 
 # قراءة ملف CV.csv وحفظ البيانات المطلوبة في ملف جديد
 input_file = '2.CS.csv'
-output_file = 'filtered_CV.csv'
+output_file = '4.filtered-Data.csv'
 
 # فتح الملف الأصلي للقراءة
 with open(input_file, mode='r', encoding='windows-1252') as infile:
