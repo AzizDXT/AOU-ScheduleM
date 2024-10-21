@@ -45,6 +45,11 @@ def filter_data(csv_file):
                 aou_email = row['AOU_EMAIL']
                 full_schedule = row['FullSchedule']
                 
+                # التحقق من أن اسم المدرس لا يحتوي على "TBA"
+                if 'TBA' in tutor_name.upper():
+                    print(f"Skipping tutor with TBA: {tutor_name}")
+                    continue  # تجاوز هذا الصف
+
                 if tutor_name in tutor_schedule:
                     if full_schedule not in tutor_schedule[tutor_name]['FullSchedule']:
                         tutor_schedule[tutor_name]['FullSchedule'].append(full_schedule)
@@ -107,4 +112,4 @@ def response():
 
 if __name__ == '__main__':
     threading.Thread(target=start_monitoring, daemon=True).start()  # بدء المراقبة في خيط منفصل
-    app.run(debug=True, port=5000)
+    app.run(debug=True, port=8080)
