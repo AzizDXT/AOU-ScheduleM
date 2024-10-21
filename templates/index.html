@@ -211,7 +211,7 @@
             }
 
             const workingHours = "Sunday to Thursday, 8 AM to 10 PM";
-            const schedules = selectedTutors.map(tutor => `${tutor.name}: ${tutor.schedule}`).join(', ');
+            const schedules = selectedTutors.map(tutor => ${tutor.name}: ${tutor.schedule}).join(', ');
 
             const now = new Date();
             const muscatTime = now.toLocaleString("en-US", { timeZone: "Asia/Muscat" });
@@ -222,14 +222,14 @@
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer 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`, // استبدل بمفتاح API الخاص بك
+                    'Authorization': Bearer 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, // استبدل بمفتاح API الخاص بك
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     model: "gpt-4o",
                     messages: [
                         { role: "system", content: "You are a helpful assistant." },
-                        { role: "user", content: `Please suggest available meeting times for the following tutors: ${schedules} on ${currentDate} for a duration of ${meetingDuration} hours. Their working hours are: ${workingHours}. + response as a html code! (important!!) please ALL RESPONSE HTML FROM FIRST LATTER TO END!! TO AVOIDE ERRORS! & remove 'html' word in the first and qute marks + with orgnized report with Table if avaliable + report first and table under report and make line like --------- to supret in the end` }
+                        { role: "user", content: Please suggest available meeting times for the following tutors: ${schedules} on ${currentDate} for a duration of ${meetingDuration} hours. Their working hours are: ${workingHours}. + response as a html code! (important!!) please ALL RESPONSE HTML FROM FIRST LATTER TO END!! TO AVOIDE ERRORS! & remove 'html' word in the first and qute marks + with orgnized report with Table if avaliable + report first and table under report and make line like --------- to supret in the end }
                     ],
                     max_tokens: 10000,
                 })
@@ -246,19 +246,19 @@
         }
 
         function createSchedule(selectedTutors, availableSlots) {
-            const tutorData = selectedTutors.map(tutor => `${tutor.name} (${tutor.email}): ${tutor.schedule}`).join('; ');
+            const tutorData = selectedTutors.map(tutor => ${tutor.name} (${tutor.email}): ${tutor.schedule}).join('; ');
 
             return fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer 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`, // استبدل بمفتاح API الخاص بك
+                    'Authorization': Bearer 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, // استبدل بمفتاح API الخاص بك
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     model: "gpt-4o",
                     messages: [
                         { role: "system", content: "You are a helpful assistant." },
-                        { role: "user", content: `Create a meeting schedule for the following tutors: ${tutorData}. (only respond with meeting schedule TABLE HTML CODE!! directly!! to avoid errors (HTML code response)) + The schedule is for five days a week and the timings are from 8:00 am to 10:00 pm from Sunday to Thursday. The table should show when the tutors are busy & free!, which rooms they will be in, and include any necessary notes or alerts. + Ensure to remove any unnecessary HTML wording and include notes in a separate cell under the table if needed.` }
+                        { role: "user", content: Create a meeting schedule for the following tutors: ${tutorData}. (only respond with meeting schedule TABLE HTML CODE!! directly!! to avoid errors (HTML code response)) + The schedule is for five days a week and the timings are from 8:00 am to 10:00 pm from Sunday to Thursday. The table should show when the tutors are busy & free!, which rooms they will be in, and include any necessary notes or alerts. + Ensure to remove any unnecessary HTML wording and include notes in a separate cell under the table if needed. }
                     ],
                     max_tokens: 10000,
                 })
@@ -266,7 +266,7 @@
             .then(response => response.json())
             .then(data => {
                 const scheduleHTML = data.choices[0].message.content;
-                document.getElementById('finalScheduleTable').innerHTML = `<h2>Final Schedule</h2>${scheduleHTML}`;
+                document.getElementById('finalScheduleTable').innerHTML = <h2>Final Schedule</h2>${scheduleHTML};
             })
             .catch(error => console.error('Error creating schedule:', error));
         }
@@ -278,7 +278,7 @@
             slots.forEach(slot => {
                 const [tutor, time] = slot.split(': ');
                 if (tutor && time) {
-                    scheduleHTML += `<tr><td>${tutor}</td><td>${time}</td></tr>`;
+                    scheduleHTML += <tr><td>${tutor}</td><td>${time}</td></tr>;
                 }
             });
 
