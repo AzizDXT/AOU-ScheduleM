@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AOUom Faculty Schedule</title>
+    <title>AOUOM Faculty Schedule</title>
     <link rel="icon" type="image/png" href="https://s01.babup.com/uploads/faviconaou.jpg" sizes="32x32">
     <link rel="icon" type="image/png" href="https://s01.babup.com/uploads/faviconaou.jpg" sizes="16x16">
     <link rel="apple-touch-icon" href="https://s01.babup.com/uploads/faviconaou.jpg">
@@ -93,7 +93,7 @@
 <body>
     <div class="container text-center">
         <img src="https://s01.babup.com/uploads/AOU.png" alt="AOU Logo" class="logo">
-        <h1 class="mt-4">AOUom Faculty Schedule</h1>
+        <h1 class="mt-4">AOUOM Faculty Schedule</h1>
         <p class="lead">AOUOM faculty busy slots based on Fall 2024 Master Timetable retrieved on Tuesday, October 8, 2024 11:25 AM</p>
 
         <label for="meetingDuration">Meeting Duration (hours):</label>
@@ -109,11 +109,6 @@
         </div>
 
         <input type="text" id="search" class="form-control mb-3" placeholder="Search by name or email">
-
-        <div class="form-check mb-3">
-            <input type="checkbox" id="hideTBA" class="form-check-input" onchange="filterTutors()">
-            <label class="form-check-label" for="hideTBA">Hide TBA</label>
-        </div>
 
         <label for="courseProgram">Select Course Program:</label>
         <select id="courseProgram" class="form-control mb-3" onchange="filterTutorsByProgram()">
@@ -155,23 +150,23 @@
     <script>
         function filterTutors() {
             const query = document.getElementById('search').value.toLowerCase();
-            const isChecked = document.getElementById('hideTBA').checked;
             const tutorCards = document.querySelectorAll('.tutor-card');
             const selectedProgram = document.getElementById('courseProgram').value;
-            
+
             tutorCards.forEach(card => {
                 const scheduleText = card.querySelector('.tutor-checkbox').dataset.schedule;
                 const tutorName = card.querySelector('.tutor-checkbox').dataset.name.toLowerCase();
                 const tutorEmail = card.querySelector('.tutor-checkbox').dataset.email.toLowerCase();
 
                 const matchesSearch = tutorName.includes(query) || tutorEmail.includes(query);
-                const shouldHideTBA = isChecked && scheduleText.includes('TBA');
+                const containsTBA = scheduleText.includes('TBA');
                 const matchesProgram = selectedProgram === 'all' || card.classList.contains(selectedProgram);
 
-                if (matchesSearch && !shouldHideTBA && matchesProgram) {
+                // تعديل الإخفاء التلقائي
+                if (matchesSearch && matchesProgram && !containsTBA) {
                     card.style.display = 'block';
                 } else {
-                    card.style.display = 'none';
+                    card.style.display = 'none'; // إخفاء البطاقات التي تحتوي على TBA
                 }
             });
 
@@ -181,7 +176,7 @@
         function filterTutorsByProgram() {
             filterTutors();
         }
-
+        
         function toggleSelectAll() {
             const selectAllChecked = document.getElementById('selectAll').checked;
             const visibleTutors = document.querySelectorAll('.tutor-card[style*="block"] .tutor-checkbox');
@@ -222,14 +217,14 @@
             const response = await fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer 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`, // استبدل بمفتاح API الخاص بك
+                    'Authorization': `Bearer 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`, // استبدل بمفتاح API الخاص بك
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     model: "gpt-4o",
                     messages: [
                         { role: "system", content: "You are a helpful assistant." },
-                        { role: "user", content: `Please suggest available meeting times for the following tutors: ${schedules} on ${currentDate} for a duration of ${meetingDuration} hours. Their working hours are: ${workingHours}. + response as a html code! (important!!) please ALL RESPONSE HTML FROM FIRST LATTER TO END!! TO AVOIDE ERRORS! & remove 'html' word in the first and qute marks + with orgnized report with Table if avaliable + report first and table under report and make line like --------- to supret in the end` }
+                        { role: "user", content: `Please suggest available meeting times for the following teachers: ${schedules} at ${currentDate} for ${meetingDuration} hours Of course this is the data of when they are busy, I want a detailed report of all appointments where they are empty without classes at all .. Of course I want a report of the nearest meetings this week starting from today's date and time. Their working hours are: ${workingHours}. + Reply as HTML code! (Important!!) Please all replies in HTML format from first to last!! To avoid errors! & Remove the word "html" in the first tag and the quotes + With an organized report with a table if available + The report first and the table below the report and make a line like --------- to be fixed at the end .. Apply all points exactly` }
                     ],
                     max_tokens: 10000,
                 })
@@ -251,14 +246,14 @@
             return fetch('https://api.openai.com/v1/chat/completions', {
                 method: 'POST',
                 headers: {
-                    'Authorization': `Bearer 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`, // استبدل بمفتاح API الخاص بك
+                    'Authorization': `Bearer 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`, // استبدل بمفتاح API الخاص بك
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     model: "gpt-4o",
                     messages: [
                         { role: "system", content: "You are a helpful assistant." },
-                        { role: "user", content: `Create a meeting schedule for the following tutors: ${tutorData}. (only respond with meeting schedule TABLE HTML CODE!! directly!! to avoid errors (HTML code response)) + The schedule is for five days a week and the timings are from 8:00 am to 10:00 pm from Sunday to Thursday. The table should show when the tutors are busy & free!, which rooms they will be in, and include any necessary notes or alerts. + Ensure to remove any unnecessary HTML wording and include notes in a separate cell under the table if needed.` }
+                        { role: "user", content: `Create a meeting schedule for the following teachers: ${tutorData}. (Reply only with the meeting schedule HTML code!! Directly!! to avoid errors (HTML code response)) + The schedule is for 5 days a week and the timings are 8:00am-10:00pm Sunday through Thursday. The schedule should show when teachers are available in the schedule (green) and busy (red!), which rooms they will be in, and include any necessary notes or alerts. + Be sure to remove any unnecessary HTML and include notes in a separate cell below the schedule if necessary.` }
                     ],
                     max_tokens: 10000,
                 })
