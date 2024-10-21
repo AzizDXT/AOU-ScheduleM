@@ -107,4 +107,4 @@ def response():
 
 if __name__ == '__main__':
     threading.Thread(target=start_monitoring, daemon=True).start()  # بدء المراقبة في خيط منفصل
-    app.run(debug=True, port=80)
+    app.run(debug=True, port=8090)
