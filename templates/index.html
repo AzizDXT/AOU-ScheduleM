@@ -258,7 +258,7 @@
                     model: "gpt-4o",
                     messages: [
                         { role: "system", content: "You are a helpful assistant." },
-                        { role: "user", content: `Create a meeting schedule for the following tutors: ${tutorData}. (only response meeting schedule TABLE HTML CODE!! directly!! to avoid errors (HTML code response)) + if need tell me any noite make noite cell ander table + The schedule is for five days a week and the timings are from 8:00 am to 10:00 pm From Sunday to Thursday. + remove html word in the first and qute marks + (The Table shows days and times for work time) ` }
+                        { role: "user", content: `Create a meeting schedule for the following tutors: ${tutorData}. (only respond with meeting schedule TABLE HTML CODE!! directly!! to avoid errors (HTML code response)) + The schedule is for five days a week and the timings are from 8:00 am to 10:00 pm from Sunday to Thursday. The table should show when the tutors are busy & free!, which rooms they will be in, and include any necessary notes or alerts. + Ensure to remove any unnecessary HTML wording and include notes in a separate cell under the table if needed.` }
                     ],
                     max_tokens: 10000,
                 })
